@@ -1,1 +1,1 @@
-export const environment = { apiUrl: 'http://localhost:5000/api' };
+export const environment = { apiUrl: 'https://backtaller-1op6.onrender.com/api' };
