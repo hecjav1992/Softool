@@ -1,0 +1,136 @@
+<header class="topbar">
+  <div class="mark">ED</div>
+  <div>
+    <small>EASY DATA · SERVICIO TÉCNICO</small>
+    <h1>Generador de diagnósticos</h1>
+  </div>
+</header>
+
+<main class="workspace">
+  <section class="panel">
+    <div class="heading">
+      <span>Diagnóstico técnico</span>
+      <h2>Registrar diagnóstico del equipo</h2>
+      <p>La existencia del equipo se verificará automáticamente al presionar “Generar PDF”.</p>
+    </div>
+
+    <form #f="ngForm" (ngSubmit)="generarPdf(f)">
+      <div class="grid">
+        <label class="full">
+          N.º de ingreso
+          <input
+            required
+            name="numeroIngreso"
+            [(ngModel)]="form.numeroIngreso"
+            placeholder="ING-2026-001">
+        </label>
+
+        <label>
+          N.º de informe
+          <input
+            required
+            name="numeroInforme"
+            [(ngModel)]="form.numeroInforme"
+            placeholder="ED-2026-001">
+        </label>
+
+        <label>
+          Fecha
+          <input
+            required
+            type="date"
+            name="fecha"
+            [(ngModel)]="form.fecha">
+        </label>
+
+        <label class="full">
+          Diagnóstico técnico
+          <textarea
+            required
+            rows="7"
+            name="diagnosticoTecnico"
+            [(ngModel)]="form.diagnosticoTecnico"
+            placeholder="Describa las pruebas realizadas, hallazgos y causa probable de la falla."></textarea>
+        </label>
+
+        <label class="full">
+          Recomendación
+          <textarea
+            required
+            rows="5"
+            name="recomendacion"
+            [(ngModel)]="form.recomendacion"
+            placeholder="Indique la reparación recomendada, repuestos y observaciones."></textarea>
+        </label>
+      </div>
+
+      <label class="upload">
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          (change)="seleccionarArchivo($event)">
+        <img *ngIf="vistaPrevia" [src]="vistaPrevia" alt="Evidencia">
+        <span>{{ evidencia?.name || 'Adjuntar fotografía de evidencia' }}</span>
+      </label>
+
+      <p class="message" *ngIf="mensaje">{{ mensaje }}</p>
+
+      <div class="actions">
+        <button type="button" class="secondary" (click)="limpiar(f)" [disabled]="enviando">
+          Limpiar
+        </button>
+        <button type="submit" class="primary" [disabled]="enviando">
+          {{ enviando ? 'Verificando y generando…' : 'Generar PDF' }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <aside class="preview">
+    <article class="paper">
+      <div class="accent"></div>
+      <header>
+        <div class="brand">
+          <b>ED</b>
+          <div>
+            <strong>EASY DATA</strong>
+            <small>TECNOLOGÍA Y SERVICIO TÉCNICO</small>
+          </div>
+        </div>
+        <div class="meta">
+          <b>INFORME TÉCNICO</b>
+          <span>{{ form.numeroInforme || 'SIN NÚMERO' }}</span>
+        </div>
+      </header>
+
+      <section class="title">
+        <small>DIAGNÓSTICO DE EQUIPO</small>
+        <h2>{{ form.marca || 'Datos cargados al generar' }} {{ form.modelo }}</h2>
+      </section>
+
+      <div class="facts">
+        <div><small>INGRESO</small><b>{{ form.numeroIngreso || '—' }}</b></div>
+        <div><small>CLIENTE</small><b>{{ form.cliente || 'Se cargará al verificar' }}</b></div>
+        <div><small>TELÉFONO</small><b>{{ form.telefono || '—' }}</b></div>
+        <div><small>FECHA</small><b>{{ form.fecha }}</b></div>
+        <div><small>IMEI</small><b>{{ form.imeiSerie || '—' }}</b></div>
+      </div>
+
+      <section>
+        <h3>01 Diagnóstico técnico</h3>
+        <p>{{ form.diagnosticoTecnico || 'Sin diagnóstico registrado.' }}</p>
+      </section>
+
+      <section>
+        <h3>02 Recomendación</h3>
+        <p>{{ form.recomendacion || 'Sin recomendación registrada.' }}</p>
+      </section>
+
+      <section>
+        <h3>03 Evidencia fotográfica</h3>
+        <img class="photo" *ngIf="vistaPrevia" [src]="vistaPrevia">
+        <p *ngIf="!vistaPrevia">No se adjuntó evidencia.</p>
+      </section>
+    </article>
+  </aside>
+</main>
