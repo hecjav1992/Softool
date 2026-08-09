@@ -1,0 +1,147 @@
+<section class="bi-page">
+  <div class="bi-head">
+    <div>
+      <p class="eyebrow">EASY DATA · BUSINESS INTELLIGENCE</p>
+      <h1>Inteligencia de negocio</h1>
+      <p class="subtitle">
+        Indicadores operativos del taller basados en ingresos y diagnósticos registrados.
+      </p>
+    </div>
+
+    <button type="button" class="refresh" (click)="cargar()" [disabled]="cargando">
+      {{ cargando ? 'Actualizando…' : 'Actualizar' }}
+    </button>
+  </div>
+
+  <div *ngIf="cargando" class="state">Cargando indicadores…</div>
+  <div *ngIf="error" class="state error">{{ error }}</div>
+
+  <ng-container *ngIf="data && !cargando">
+    <div class="kpis">
+      <article class="kpi">
+        <span>Equipos ingresados</span>
+        <strong>{{ data.kpis.totalIngresos }}</strong>
+        <small>Total acumulado</small>
+      </article>
+
+      <article class="kpi">
+        <span>Diagnósticos</span>
+        <strong>{{ data.kpis.totalDiagnosticos }}</strong>
+        <small>Informes registrados</small>
+      </article>
+
+      <article class="kpi">
+        <span>Diagnosticados</span>
+        <strong>{{ data.kpis.diagnosticados }}</strong>
+        <small>Equipos cerrados técnicamente</small>
+      </article>
+
+      <article class="kpi">
+        <span>Pendientes</span>
+        <strong>{{ data.kpis.pendientes }}</strong>
+        <small>Requieren atención</small>
+      </article>
+
+      <article class="kpi accent">
+        <span>Tasa de diagnóstico</span>
+        <strong>{{ data.kpis.tasaDiagnostico }}%</strong>
+        <small>Diagnosticados / ingresos</small>
+      </article>
+    </div>
+
+    <div class="grid">
+      <article class="panel wide">
+        <header>
+          <div>
+            <h2>Diagnósticos por mes</h2>
+            <p>Comportamiento de los últimos seis meses</p>
+          </div>
+        </header>
+
+        <div class="vertical-chart">
+          <div class="vcol" *ngFor="let item of data.diagnosticosPorMes">
+            <span class="value">{{ item.cantidad }}</span>
+            <div class="vtrack">
+              <div
+                class="vbar"
+                [style.height.%]="ancho(item.cantidad, maxMes())">
+              </div>
+            </div>
+            <span class="label">{{ item.etiqueta }}</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <header>
+          <div>
+            <h2>Estado de equipos</h2>
+            <p>Distribución actual</p>
+          </div>
+        </header>
+
+        <div class="status-list">
+          <div class="status-row" *ngFor="let item of data.porEstado">
+            <div>
+              <strong>{{ item.nombre }}</strong>
+              <span>{{ item.cantidad }} equipo(s)</span>
+            </div>
+            <b>{{ data.kpis.totalIngresos ? ((item.cantidad / data.kpis.totalIngresos) * 100 | number:'1.0-1') : 0 }}%</b>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <header>
+          <div>
+            <h2>Equipos por tipo</h2>
+            <p>Qué equipos llegan más al taller</p>
+          </div>
+        </header>
+
+        <div class="bar-list">
+          <div class="bar-row" *ngFor="let item of data.porTipoEquipo">
+            <div class="bar-meta">
+              <span>{{ item.nombre }}</span>
+              <strong>{{ item.cantidad }}</strong>
+            </div>
+            <div class="track">
+              <div
+                class="bar"
+                [style.width.%]="ancho(item.cantidad, maxTipo())">
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <header>
+          <div>
+            <h2>Marcas más recibidas</h2>
+            <p>Top 8 por cantidad de ingresos</p>
+          </div>
+        </header>
+
+        <div class="bar-list">
+          <div class="bar-row" *ngFor="let item of data.porMarca">
+            <div class="bar-meta">
+              <span>{{ item.nombre }}</span>
+              <strong>{{ item.cantidad }}</strong>
+            </div>
+            <div class="track">
+              <div
+                class="bar"
+                [style.width.%]="ancho(item.cantidad, maxMarca())">
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <p class="updated">
+      Última actualización: {{ data.generadoEnUtc | date:'dd/MM/yyyy HH:mm' }} UTC
+    </p>
+  </ng-container>
+</section>
