@@ -4,6 +4,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { BiDashboardComponent } from './pages/inteligencia-negocio/bi-dashboard.component';
 import { IngresosComponent } from './pages/ingresos/ingresos.component';
 import { DiagnosticosComponent } from './pages/diagnosticos/diagnosticos.component';
+import {HistorialComponent} from './pages/historial/historial.component';
 
 import { ShellComponent } from './layout/shell.component';
 import { authGuard } from './services/auth.guard';
@@ -46,7 +47,11 @@ export const routes: Routes = [
       {
         path: 'inteligencia-negocio',
         component: BiDashboardComponent
-      }
+      },
+      {
+        path: 'historial',
+        component: HistorialComponent
+     }
 
     ]
   },

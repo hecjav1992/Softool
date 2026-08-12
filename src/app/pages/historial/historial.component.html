@@ -1,0 +1,330 @@
+<section class="historial">
+
+  <div class="encabezado">
+
+    <div>
+
+      <p class="eyebrow">
+        EASY DATA
+      </p>
+
+      <h1>
+        Historial de equipos
+      </h1>
+
+      <p>
+        Consulte los equipos ingresados,
+        diagnósticos y documentos técnicos.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- BUSCADOR -->
+
+  <div class="buscador">
+
+    <input
+      type="text"
+      [(ngModel)]="buscar"
+      (keyup.enter)="buscarRegistros()"
+      placeholder="
+      Buscar por ingreso, cliente,
+      teléfono, marca, modelo,
+      IMEI o tipo de equipo">
+
+    <button
+      type="button"
+      (click)="buscarRegistros()">
+
+      Buscar
+
+    </button>
+
+    <button
+      type="button"
+      class="secundario"
+      (click)="limpiarBusqueda()">
+
+      Limpiar
+
+    </button>
+
+  </div>
+
+
+  <p
+    *ngIf="mensaje"
+    class="mensaje">
+
+    {{ mensaje }}
+
+  </p>
+
+
+  <div
+    *ngIf="cargando"
+    class="cargando">
+
+    Cargando historial...
+
+  </div>
+
+
+  <!-- TABLA -->
+
+  <div
+    class="tabla"
+    *ngIf="!cargando">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Ingreso</th>
+
+          <th>Cliente</th>
+
+          <th>Equipo</th>
+
+          <th>Marca / modelo</th>
+
+          <th>IMEI / Serie</th>
+
+          <th>Estado</th>
+
+          <th>Informe</th>
+
+          <th>Acciones</th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        <tr
+          *ngFor="let r of registros"
+          [class.clickable]="r.tienePdf"
+          (click)="r.tienePdf &&
+                   visualizarPdf(r)">
+
+          <td>
+
+            <strong>
+              {{ r.numeroIngreso }}
+            </strong>
+
+          </td>
+
+
+          <td>
+
+            {{ r.cliente }}
+
+            <small>
+              {{ r.telefono }}
+            </small>
+
+          </td>
+
+
+          <td>
+
+            {{ r.tipoEquipo }}
+
+          </td>
+
+
+          <td>
+
+            {{ r.marca }}
+
+            <small>
+              {{ r.modelo }}
+            </small>
+
+          </td>
+
+
+          <td>
+
+            {{ r.imeiSerie || '—' }}
+
+          </td>
+
+
+          <td>
+
+            <span
+              class="estado"
+              [class.diagnosticado]="
+                r.tieneDiagnostico">
+
+              {{
+                r.tieneDiagnostico
+                  ? 'Diagnosticado'
+                  : 'Ingresado'
+              }}
+
+            </span>
+
+          </td>
+
+
+          <td>
+
+            {{
+              r.numeroInforme || '—'
+            }}
+
+          </td>
+
+
+          <td
+            class="acciones"
+            (click)="$event.stopPropagation()">
+
+            <ng-container
+              *ngIf="
+                r.tienePdf;
+                else sinPdf">
+
+              <button
+                type="button"
+                class="ver"
+                (click)="visualizarPdf(r)">
+
+                Ver PDF
+
+              </button>
+
+
+              <button
+                type="button"
+                class="descargar"
+                (click)="descargarPdf(r)">
+
+                Descargar
+
+              </button>
+
+            </ng-container>
+
+
+            <ng-template #sinPdf>
+
+              <span class="sin-pdf">
+                Sin diagnóstico
+              </span>
+
+            </ng-template>
+
+          </td>
+
+        </tr>
+
+
+        <tr
+          *ngIf="
+            registros.length === 0">
+
+          <td
+            colspan="8"
+            class="vacio">
+
+            No se encontraron registros.
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
+<!-- MODAL PDF -->
+
+<div
+  class="modal-fondo"
+  *ngIf="pdfAbierto">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <div>
+
+        <strong>
+          Informe técnico
+        </strong>
+
+        <small>
+          {{
+            registroSeleccionado?.numeroInforme
+          }}
+        </small>
+
+      </div>
+
+      <button
+        type="button"
+        class="cerrar"
+        (click)="cerrarPdf()">
+
+        ×
+
+      </button>
+
+    </div>
+
+
+    <div class="visor">
+
+      <iframe
+        *ngIf="pdfUrl"
+        [src]="pdfUrl">
+
+      </iframe>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button
+        type="button"
+        *ngIf="registroSeleccionado"
+        (click)="
+          descargarPdf(
+            registroSeleccionado
+          )">
+
+        Descargar PDF
+
+      </button>
+
+      <button
+        type="button"
+        class="secundario"
+        (click)="cerrarPdf()">
+
+        Cerrar
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
