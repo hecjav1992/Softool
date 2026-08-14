@@ -1,1 +1,158 @@
-<h1>Ingreso de equipos</h1><p class="sub">Registre el equipo recibido antes de realizar el diagnóstico técnico.</p><div class="panel"><form (ngSubmit)="guardar()"><div class="grid"><label>N.° de ingreso<input [(ngModel)]="modelo.numeroIngreso" name="numero" required></label><label>Fecha<input type="date" [(ngModel)]="modelo.fechaIngreso" name="fecha" required></label><label>Cliente<input [(ngModel)]="modelo.cliente" name="cliente" required></label><label>Teléfono<input [(ngModel)]="modelo.telefono" name="telefono" required></label><label>Correo<input type="email" [(ngModel)]="modelo.correo" name="correo"></label><label>Tipo de equipo<select [(ngModel)]="modelo.tipoEquipo" name="tipo"><option>Celular</option><option>Tablet</option><option>Laptop</option><option>Computadora</option><option>Otro</option></select></label><label>Marca<input [(ngModel)]="modelo.marca" name="marca" required></label><label>Modelo<input [(ngModel)]="modelo.modelo" name="modelo" required></label><label>IMEI / Serie<input [(ngModel)]="modelo.imeiSerie" name="imei" required></label><label>Accesorios recibidos<input [(ngModel)]="modelo.accesorios" name="accesorios"></label><label class="full">Estado físico<textarea [(ngModel)]="modelo.estadoFisico" name="estado" required></textarea></label><label class="full">Falla reportada<textarea [(ngModel)]="modelo.fallaReportada" name="falla" required></textarea></label><label class="full">Observaciones<textarea [(ngModel)]="modelo.observaciones" name="obs"></textarea></label></div><div class="msg" *ngIf="mensaje">{{mensaje}}</div><button>Guardar ingreso</button></form></div><div class="panel"><h2>Equipos registrados</h2><div class="table"><table><thead><tr><th>Ingreso</th><th>Cliente</th><th>Equipo</th><th>IMEI/Serie</th><th>Estado</th></tr></thead><tbody><tr *ngFor="let x of lista"><td>{{x.numeroIngreso}}</td><td>{{x.cliente}}</td><td>{{x.marca}} {{x.modelo}}</td><td>{{x.imeiSerie}}</td><td><span class="badge">{{x.estado}}</span></td></tr></tbody></table></div></div>
+<h1>Ingreso de equipos</h1>
+<p class="sub">Registre el equipo recibido antes de realizar el diagnóstico técnico.</p>
+
+<div class="panel">
+  <form (ngSubmit)="guardar()">
+    <div class="grid">
+      <label>
+        N.° de ingreso
+        <input [(ngModel)]="modelo.numeroIngreso" name="numero" required>
+      </label>
+
+      <label>
+        Fecha
+        <input type="date" [(ngModel)]="modelo.fechaIngreso" name="fecha" required>
+      </label>
+
+      <label>
+        Cliente
+        <input [(ngModel)]="modelo.cliente" name="cliente" required>
+      </label>
+
+      <label>
+        Teléfono
+        <input [(ngModel)]="modelo.telefono" name="telefono" required>
+      </label>
+
+      <label>
+        Correo
+        <input type="email" [(ngModel)]="modelo.correo" name="correo">
+      </label>
+
+      <label>
+        Tipo de equipo
+        <select [(ngModel)]="modelo.tipoEquipo" name="tipo">
+          <option>Celular</option>
+          <option>Tablet</option>
+          <option>Laptop</option>
+          <option>Computadora</option>
+          <option>Otro</option>
+        </select>
+      </label>
+
+      <label>
+        Marca
+        <input [(ngModel)]="modelo.marca" name="marca" required>
+      </label>
+
+      <label>
+        Modelo
+        <input [(ngModel)]="modelo.modelo" name="modelo" required>
+      </label>
+
+      <label>
+        IMEI / Serie
+        <input [(ngModel)]="modelo.imeiSerie" name="imei" required>
+      </label>
+
+      <label>
+        Accesorios recibidos
+        <input [(ngModel)]="modelo.accesorios" name="accesorios">
+      </label>
+
+      <label class="full">
+        Estado físico
+        <textarea [(ngModel)]="modelo.estadoFisico" name="estado" required></textarea>
+      </label>
+
+      <label class="full">
+        Falla reportada
+        <textarea [(ngModel)]="modelo.fallaReportada" name="falla" required></textarea>
+      </label>
+
+      <label class="full">
+        Observaciones
+        <textarea [(ngModel)]="modelo.observaciones" name="obs"></textarea>
+      </label>
+    </div>
+
+    <div class="msg" *ngIf="mensaje">{{ mensaje }}</div>
+    <div class="msg error" *ngIf="error">{{ error }}</div>
+
+    <button type="submit" [disabled]="guardando">
+      {{ guardando ? 'Guardando…' : 'Guardar ingreso y descargar PDF' }}
+    </button>
+  </form>
+</div>
+
+<div class="panel">
+  <h2>Equipos registrados</h2>
+
+  <div class="buscador">
+    <input
+      type="search"
+      [(ngModel)]="busqueda"
+      (keyup.enter)="buscar()"
+      placeholder="Buscar por ingreso, cliente, teléfono, tipo, marca, modelo, IMEI/serie o correo">
+
+    <button type="button" class="btn-buscar" (click)="buscar()">
+      Buscar
+    </button>
+
+    <button type="button" class="btn-limpiar" (click)="limpiarBusqueda()" *ngIf="busqueda">
+      Limpiar
+    </button>
+  </div>
+
+  <div class="resultado-info" *ngIf="!cargando">
+    {{ lista.length }} registro(s) encontrado(s)
+  </div>
+
+  <div class="cargando" *ngIf="cargando">Cargando equipos…</div>
+
+  <div class="table" *ngIf="!cargando">
+    <table>
+      <thead>
+        <tr>
+          <th>Ingreso</th>
+          <th>Cliente</th>
+          <th>Tipo</th>
+          <th>Equipo</th>
+          <th>IMEI/Serie</th>
+          <th>Estado</th>
+          <th>Comprobante</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let x of lista">
+          <td><strong>{{ x.numeroIngreso }}</strong></td>
+          <td>
+            {{ x.cliente }}
+            <small>{{ x.telefono }}</small>
+          </td>
+          <td>{{ x.tipoEquipo }}</td>
+          <td>
+            {{ x.marca }} {{ x.modelo }}
+          </td>
+          <td>{{ x.imeiSerie }}</td>
+          <td><span class="badge">{{ x.estado }}</span></td>
+          <td>
+            <button
+              type="button"
+              class="btn-pdf"
+              (click)="descargarIngreso(x, $event)">
+              Descargar PDF
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="lista.length === 0">
+          <td colspan="7" class="sin-resultados">
+            No se encontraron equipos con ese criterio de búsqueda.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
