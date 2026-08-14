@@ -50,7 +50,7 @@ export class IngresosComponent implements OnInit {
 
     });
 
-};
+}
 
   nuevo(): IngresoEquipo {
     return {
