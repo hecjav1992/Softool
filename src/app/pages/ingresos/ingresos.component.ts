@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IngresosService } from '../../services/ingresos.service';
 import { IngresoEquipo } from '../../models/ingreso';
+import { Marca } from '../../models/marca';
+import { MarcasService } from '../../services/marcas.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -18,14 +20,37 @@ export class IngresosComponent implements OnInit {
   busqueda = '';
   cargando = false;
   guardando = false;
+  marcas: Marca[] = [];
 
   modelo: IngresoEquipo = this.nuevo();
 
-  constructor(private api: IngresosService) {}
+  constructor(private api: IngresosService, private marcasService: MarcasService) {}
 
   ngOnInit(): void {
+     this.cargarMarcas();
     this.cargar();
   }
+
+  cargarMarcas(): void {
+
+  this.marcasService
+    .listar()
+    .subscribe({
+
+      next: datos => {
+        this.marcas = datos;
+      },
+
+      error: error => {
+        console.error(
+          'Error cargando marcas',
+          error
+        );
+      }
+
+    });
+
+};
 
   nuevo(): IngresoEquipo {
     return {
