@@ -40,30 +40,19 @@
         </select>
       </label>
 
-<label for="marca">
-  Marca
-</label>
-
 <select
-  id="marca"
   name="marca"
-  [(ngModel)]="form.marca"
+  [(ngModel)]="ingreso.marca"
   required>
 
-  <option
-    value=""
-    disabled>
-
+  <option value="" disabled>
     Seleccione una marca
-
   </option>
 
   <option
     *ngFor="let marca of marcas"
     [value]="marca.nombre">
-
     {{ marca.nombre }}
-
   </option>
 
 </select>
