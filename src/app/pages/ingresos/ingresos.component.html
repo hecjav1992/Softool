@@ -103,27 +103,21 @@
         <textarea [(ngModel)]="modelo.observaciones" name="obs"></textarea>
       </label>
 
-      <label class="full">
-  Foto / evidencia del equipo
-
+<label class="upload-box">
   <input
     type="file"
     accept="image/jpeg,image/png,image/webp"
     (change)="seleccionarEvidencia($event)">
-</label>
-<div
-  class="full evidencia-preview"
-  *ngIf="evidenciaPreview">
 
-  <p>
-    Evidencia seleccionada
-  </p>
+  <span *ngIf="!evidenciaPreview">
+    Adjuntar fotografía de evidencia
+  </span>
 
   <img
+    *ngIf="evidenciaPreview"
     [src]="evidenciaPreview"
-    alt="Vista previa de la evidencia">
-
-</div>
+    alt="Vista previa de evidencia">
+</label>
     </div>
 
     <div class="msg" *ngIf="mensaje">{{ mensaje }}</div>
