@@ -21,6 +21,8 @@ export class IngresosComponent implements OnInit {
   cargando = false;
   guardando = false;
   marcas: Marca[] = [];
+  evidencia: File | null = null;
+  evidenciaPreview: string | null = null;
 
   modelo: IngresoEquipo = this.nuevo();
 
@@ -52,23 +54,85 @@ export class IngresosComponent implements OnInit {
 
 }
 
-  nuevo(): IngresoEquipo {
-    return {
-      numeroIngreso: `ING-${new Date().getFullYear()}-${Date.now().toString().slice(-5)}`,
-      fechaIngreso: new Date().toISOString().slice(0, 10),
-      cliente: '',
-      telefono: '',
-      correo: '',
-      tipoEquipo: 'Celular',
-      marca: '',
-      modelo: '',
-      imeiSerie: '',
-      accesorios: '',
-      estadoFisico: '',
-      fallaReportada: '',
-      observaciones: ''
-    };
+ nuevo(): IngresoEquipo {
+  return {
+    numeroIngreso:
+      `ING-${new Date().getFullYear()}-${Date.now().toString().slice(-5)}`,
+
+    fechaIngreso:
+      new Date().toISOString().slice(0, 10),
+
+    cliente: '',
+    cedula: '',
+    telefono: '',
+    correo: '',
+
+    tipoEquipo: 'Celular',
+
+    marca: '',
+    modelo: '',
+    imeiSerie: '',
+
+    accesorios: '',
+    estadoFisico: '',
+    fallaReportada: '',
+    observaciones: ''
+  };
+}
+
+seleccionarEvidencia(
+  event: Event
+): void {
+
+  const input =
+    event.target as HTMLInputElement;
+
+  const archivo =
+    input.files?.[0];
+
+  if (!archivo) {
+    return;
   }
+
+  const permitidos = [
+    'image/jpeg',
+    'image/png',
+    'image/webp'
+  ];
+
+  if (!permitidos.includes(archivo.type)) {
+
+    this.error =
+      'La evidencia debe ser JPG, PNG o WEBP.';
+
+    input.value = '';
+
+    return;
+  }
+
+  if (archivo.size > 8_000_000) {
+
+    this.error =
+      'La evidencia no puede superar los 8 MB.';
+
+    input.value = '';
+
+    return;
+  }
+
+  this.error = '';
+
+  this.evidencia = archivo;
+
+  if (this.evidenciaPreview) {
+    URL.revokeObjectURL(
+      this.evidenciaPreview
+    );
+  }
+
+  this.evidenciaPreview =
+    URL.createObjectURL(archivo);
+}
 
   cargar(): void {
     this.cargando = true;
@@ -95,27 +159,63 @@ export class IngresosComponent implements OnInit {
     this.cargar();
   }
 
-  guardar(): void {
-    this.guardando = true;
-    this.mensaje = '';
-    this.error = '';
+guardar(): void {
 
-    const numeroIngreso = this.modelo.numeroIngreso;
+  this.guardando = true;
 
-    this.api.crear(this.modelo).subscribe({
+  this.mensaje = '';
+  this.error = '';
+
+  const numeroIngreso =
+    this.modelo.numeroIngreso;
+
+  this.api
+    .crear(
+      this.modelo,
+      this.evidencia
+    )
+    .subscribe({
+
       next: blob => {
-        this.descargarBlob(blob, `${numeroIngreso}.pdf`);
-        this.mensaje = 'Equipo ingresado correctamente. Se descargó el comprobante PDF.';
-        this.modelo = this.nuevo();
+
+        this.descargarBlob(
+          blob,
+          `${numeroIngreso}.pdf`
+        );
+
+        this.mensaje =
+          'Equipo ingresado correctamente. Se descargó el comprobante PDF.';
+
+        this.modelo =
+          this.nuevo();
+
+        this.evidencia = null;
+
+        if (this.evidenciaPreview) {
+
+          URL.revokeObjectURL(
+            this.evidenciaPreview
+          );
+
+          this.evidenciaPreview = null;
+        }
+
         this.guardando = false;
+
         this.cargar();
       },
+
       error: async err => {
-        this.error = await this.obtenerMensajeError(err);
+
+        this.error =
+          await this.obtenerMensajeError(
+            err
+          );
+
         this.guardando = false;
       }
     });
-  }
+}
 
   descargarIngreso(x: IngresoEquipo, event?: Event): void {
     event?.stopPropagation();

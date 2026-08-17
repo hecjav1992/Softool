@@ -15,6 +15,16 @@
       </label>
 
       <label>
+  Cédula del cliente
+  <input
+    type="text"
+    name="cedula"
+    [(ngModel)]="modelo.cedula"
+    placeholder="Ej. 8-123-456"
+    required>
+</label>
+
+      <label>
         Cliente
         <input [(ngModel)]="modelo.cliente" name="cliente" required>
       </label>
@@ -92,6 +102,28 @@
         Observaciones
         <textarea [(ngModel)]="modelo.observaciones" name="obs"></textarea>
       </label>
+
+      <label class="full">
+  Foto / evidencia del equipo
+
+  <input
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    (change)="seleccionarEvidencia($event)">
+</label>
+<div
+  class="full evidencia-preview"
+  *ngIf="evidenciaPreview">
+
+  <p>
+    Evidencia seleccionada
+  </p>
+
+  <img
+    [src]="evidenciaPreview"
+    alt="Vista previa de la evidencia">
+
+</div>
     </div>
 
     <div class="msg" *ngIf="mensaje">{{ mensaje }}</div>
